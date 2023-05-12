@@ -1,13 +1,15 @@
 from argparse import ArgumentParser, BooleanOptionalAction, Namespace
 from typing import Protocol
 
+from collections import namedtuple
+
+from exceptions import LongPasswordError
 from generator import PasswordSettings
 
 #  алиас для аргументов командной строки
 ArgsRow = Namespace
 
-#  TODO добавить ограничение на поле long, чтобы оно не могло быть меньше 6 символов, реализовать в виде функции
-#  TODO создать кастомное исключение для этого случая
+
 def _get_args(parser: ArgumentParser) -> ArgsRow:
     """получает аргументы командной строки"""
     parser.add_argument(
@@ -16,53 +18,38 @@ def _get_args(parser: ArgumentParser) -> ArgsRow:
     parser.add_argument(
         "--quantity", type=int, required=False, help="Количество генерируемых паролей"
     )
-    parser.add_argument(
-        "--lowercase",
-        type=bool,
-        required=False,
-        help="Использовать строчные буквы",
-        default=True,
-        action=BooleanOptionalAction,
-    )
-    parser.add_argument(
-        "--capital",
-        type=bool,
-        required=False,
-        help="Использовать заглавные буквы",
-        default=True,
-        action=BooleanOptionalAction,
-    )
-    parser.add_argument(
-        "--numbers",
-        type=bool,
-        required=False,
-        help="Использовать цифры",
-        default=True,
-        action=BooleanOptionalAction,
-    )
-    parser.add_argument(
-        "--special",
-        type=bool,
-        required=False,
-        help="Использовать специальные символы",
-        default=True,
-        action=BooleanOptionalAction,
-    )
-    parser.add_argument(
-        "--buffer",
-        type=bool,
-        required=False,
-        help="Копировать пароли в буффер обмена",
-        default=False,
-        action=BooleanOptionalAction,
-    )
 
-    args = parser.parse_args()
-    return args
+    aggregate = namedtuple("aggregate", "flag help default")
+
+    templates = [
+        ("--lowercase", "Использовать строчные буквы", True),
+        ("--capital", "Использовать заглавные буквы", True),
+        ("--numbers", "Использовать цифры", True),
+        ("--special", "Использовать специальные символы", True),
+        ("--buffer", "Копировать пароли в буффер обмена", False),
+    ]
+    for template in templates:
+        args = aggregate(*template)
+        parser.add_argument(
+            args.flag,
+            type=bool,
+            required=False,
+            help=args.help,
+            default=args.default,
+            action=BooleanOptionalAction,
+        )
+    results = parser.parse_args()
+    return results
+
+
+def validate_long(long: int | None) -> bool:
+    """Валидирует значение длинны пароля, не меньше 6"""
+    return True if long is None or long >= 6 else False
 
 
 class SettingsStorage(Protocol):
     """протокол для реализации настроек генерации паролей"""
+
     @staticmethod
     def _get_settings() -> PasswordSettings:
         raise NotImplementedError
@@ -74,7 +61,10 @@ class SettingsPaswordStorage:
         """возвращает настройки генерации паролей"""
         args_row = _get_args(ArgumentParser())
         settings = PasswordSettings()
-        settings.long = args_row.long if args_row.long else settings.long
+        if validate_long(args_row.long):
+            settings.long = args_row.long if args_row.long else settings.long
+        else:
+            raise LongPasswordError
         settings.quantity = (
             args_row.quantity if args_row.quantity else settings.quantity
         )
@@ -90,7 +80,7 @@ class SettingsPaswordStorage:
         settings.special_characters = (
             args_row.special if not args_row.special else settings.special_characters
         )
-        settings.buffer = args_row.buffer if not args_row.buffer else settings.buffer
+        settings.buffer = args_row.buffer if args_row.buffer else settings.buffer
         return settings
 
 

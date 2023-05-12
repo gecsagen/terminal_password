@@ -39,6 +39,7 @@ class PasswordStorage(Protocol):
     def _generator_list_password(self, settings: PasswordSettings) -> list[Password]:
         raise NotImplementedError
 
+
 #  TODO: сделать гарантированное попадание в пароль хотябы 1 символа из каждого выбранного набора символов
 class PasswordGenerStorage:
     def _generator_password(self, settings: PasswordSettings) -> Password:
@@ -71,7 +72,4 @@ def gener_password(
     """Генерирует пароль"""
     if settings.quantity == 1:
         return storage._generator_password(settings)
-    else:
-        return storage._generator_list_password(settings)
-
-#  TODO: написать функцию копирования в буфер обмена сгенерированных паролей
+    return storage._generator_list_password(settings)
