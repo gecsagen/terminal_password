@@ -1,6 +1,6 @@
 from typing import Protocol
 
-import clipboard # type: ignore
+import clipboard  # type: ignore
 
 from generator import Password
 
@@ -38,10 +38,20 @@ def printer_passwords(passwords: list[Password], storage: PinterStorage) -> None
     storage._print_passwords(passwords)
 
 
-def paste_in_buffer(text: str) -> None:
+def paste_in_buffer(text: Password | list[Password]) -> None:
     """Вставляет текст в буфер обмена"""
-    clipboard.copy(text)
+    if type(text) is list:
+        paste_in_buffer_list(text)
+    elif type(text) is Password:
+        clipboard.copy(text.text_password)
+
+
+def paste_in_buffer_list(passwords_list: list[Password]):
+    passwords = []
+    for x in passwords_list:
+        passwords.append(x.text_password)
+    clipboard.copy("\n".join(passwords))
 
 
 if __name__ == "__main__":
-    paste_in_buffer("Hello World111")
+    paste_in_buffer(Password(text_password="Hello"))
