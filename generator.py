@@ -40,23 +40,24 @@ class PasswordStorage(Protocol):
         raise NotImplementedError
 
 
-#  TODO: сделать гарантированное попадание в пароль хотябы 1 символа из каждого выбранного набора символов
 class PasswordGenerStorage:
     def _generator_password(self, settings: PasswordSettings) -> Password:
         """Возвращает пароль"""
-        final_characters = ""
+        suits = []
         if settings.lowercase:
-            final_characters += LOWERCASE
+            suits.append(LOWERCASE)
         if settings.capital_letters:
-            final_characters += UPPERCASE
+            suits.append(UPPERCASE)
         if settings.numbers:
-            final_characters += NUMBERS
+            suits.append(NUMBERS)
         if settings.special_characters:
-            final_characters += SPECIAL_CHAPTERS
-        final_character_list = [character for character in final_characters]
-        random.shuffle(final_character_list)
-        password = "".join(final_character_list[: settings.long])
-        return Password(text_password=password)
+            suits.append(SPECIAL_CHAPTERS)
+        final_character_list = [character for character in "".join(suits)]
+        while True:
+            random.shuffle(final_character_list)
+            password = "".join(final_character_list[: settings.long])
+            if check_password(suits, password):
+                return Password(text_password=password)
 
     def _generator_list_password(self, settings: PasswordSettings) -> list[Password]:
         """Возвращает список паролей"""
@@ -64,6 +65,15 @@ class PasswordGenerStorage:
             self._generator_password(settings) for x in range(settings.quantity)
         ]
         return list_password
+
+
+def check_password(suits: list[str], password: str) -> bool:
+    """
+    Проверяет содержит ли пароль хоть
+    1 символ из переданных наборов символов
+    """
+    results_list = [any(char in suit for char in password) for suit in suits]
+    return all(results_list)
 
 
 def gener_password(
