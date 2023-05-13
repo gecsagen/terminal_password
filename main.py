@@ -2,7 +2,6 @@ from exceptions import LongPasswordError
 from format import (
     PinterPasswordStorage,
     paste_in_buffer,
-    printer_password,
     printer_passwords,
 )
 from generator import Password, PasswordGenerStorage, PasswordSettings, gener_password
@@ -21,10 +20,7 @@ def main() -> None:
     password = gener_password(settings, PasswordGenerStorage())
 
     #  печать паролей в консоль
-    if type(password) is list:
-        printer_passwords(password, PinterPasswordStorage())
-    if type(password) is Password:
-        printer_password(password, PinterPasswordStorage())
+    printer_passwords(password, PinterPasswordStorage())
 
     #  вставка паролей в буфер, если требуется
     if settings.buffer:
