@@ -3,24 +3,13 @@ import string
 from dataclasses import dataclass
 from typing import Protocol
 
+from settings import PasswordSettings
+
 #  константы с символами
 UPPERCASE = string.ascii_uppercase
 LOWERCASE = string.ascii_lowercase
 NUMBERS = "0123456789"
 SPECIAL_CHAPTERS = "!@#$%^&*()_+№;%:?+"
-
-
-@dataclass(slots=True)
-class PasswordSettings:
-    """Настройки генерации паролей"""
-
-    long: int = 12
-    quantity: int = 1
-    lowercase: bool = True
-    capital_letters: bool = True
-    numbers: bool = True
-    special_characters: bool = True
-    buffer: bool = False
 
 
 @dataclass(slots=True)

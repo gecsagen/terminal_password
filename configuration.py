@@ -1,8 +1,11 @@
 import configparser
 import os
+import os.path
 from pathlib import Path
-from generator import PasswordSettings
-from exceptions import NotValidValueInConfig
+from typing import Literal, Protocol
+
+from exceptions import EmptyConfigError, NotValidValueInConfig
+from settings import PasswordSettings
 
 
 def get_bool_from_string(string: str) -> bool:
@@ -23,12 +26,29 @@ def get_int_from_string(string: str) -> int:
     return result
 
 
+def file_exist(path: str) -> bool:
+    if os.path.exists(path):
+        return True
+    return False
+
+
+class ConfigStorage(Protocol):
+    @staticmethod
+    def _get_config(path_config: str = "") -> PasswordSettings:
+        raise NotImplementedError
+
+
 class Config:
-    def get_config(self, path_config: str = "") -> PasswordSettings:
-        # home_dir = os.path.expanduser("~")
+    @staticmethod
+    def _get_config(path_config: str = "settings.conf") -> PasswordSettings:
+        """Возвращает настройки из конфига если они есть"""
 
         config = configparser.ConfigParser()
-        config.read(f"settings.conf")
+
+        if file_exist(path_config):
+            config.read(path_config)
+        else:
+            raise EmptyConfigError
 
         # Получение значения настройки по ключу
         try:
@@ -43,20 +63,20 @@ class Config:
                 config.get("settings", "special_characters")
             )
             buffers = get_bool_from_string(config.get("settings", "buffer"))
-        except ValueError:
-            pass
+        except NotValidValueInConfig:
+            raise EmptyConfigError
 
-        # return PasswordSettings(
-        #     long=long,
-        #     lowercase=lowercase,
-        #     capital_letters=capital_letters,
-        #     numbers=numbers,
-        #     quantity=quantity,
-        #     special_characters=special_characters,
-        #     buffer=buffers,
-        # )
+        return PasswordSettings(
+            long=long,
+            lowercase=lowercase,
+            capital_letters=capital_letters,
+            numbers=numbers,
+            quantity=quantity,
+            special_characters=special_characters,
+            buffer=buffers,
+        )
 
 
-g = Config()
-# print(g.get_config())
-print(get_bool_from_string("True"))
+def get_config(storage: ConfigStorage, path_config: str = "") -> PasswordSettings:
+    """возвращает настройки из конфига"""
+    return storage._get_config(path_config)
