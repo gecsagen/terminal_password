@@ -28,7 +28,7 @@ Here is a complete reference on the possible arguments:*
 **[--quantity QUANTITY]** - number of passwords  
 **[--lowercase | --no-lowercase]** - use / do not use lowercase letters  
 **[--capital | --no-capital]** - use / do not use capital letters  
-**[--numbers | --no-numbers] **- use / do not use numbers  
+**[--numbers | --no-numbers]**- use / do not use numbers  
 **[--special | --no-special]** - use / do not use special characters  
 **[--buffer | --no-buffer]**  - copy generated passwords to clipboard  
 **[--config CONFIG]** - Use config with generation settings  
