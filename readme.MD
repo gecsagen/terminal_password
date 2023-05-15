@@ -22,7 +22,7 @@
 `python3 main.py --long 14 --quantity 5 --no-numbers`  
 
 *This example will generate 5 passwords of 14 characters each without using numbers.  
-Here is a complete reference on the possible arguments:*
+Here is a complete reference on the possible arguments:*  
 **[-h]** - reference  
 **[--long LONG]**- password length  
 **[--quantity QUANTITY]** - number of passwords  
