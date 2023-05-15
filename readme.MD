@@ -1,30 +1,30 @@
 # Console password generator  
 ### Install  
-**1. Clone the repository:  **  
+**1. Clone the repository:**  
 `git clone https://github.com/gecsagen/terminal_password.git`  
 
-**2. Creating a virtual environment  **  
+**2. Creating a virtual environment**  
 ```bash  
     cd terminal_password  
     python3 -m venv .venv  
 
 ```  
-**3. Activate the virtual environment  **  
+**3. Activate the virtual environment**  
 
 `source .venv/bin/activate  `  
 
-**4. Installing dependencies  **  
+**4. Installing dependencies**  
 
 `pip install -r requirements.txt`  
 
-**5. Launching the application  **  
+**5. Launching the application**  
 
 `python3 main.py --long 14 --quantity 5 --no-numbers`  
 
 *This example will generate 5 passwords of 14 characters each without using numbers.  
 Here is a complete reference on the possible arguments:  *
 **[-h]** - reference
-**[--long LONG] **- password length
+**[--long LONG]**- password length
 **[--quantity QUANTITY]** - number of passwords
 **[--lowercase | --no-lowercase]** - use / do not use lowercase letters
 **[--capital | --no-capital]** - use / do not use capital letters
